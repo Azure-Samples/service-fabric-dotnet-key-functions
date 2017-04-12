@@ -2,7 +2,6 @@
 using Owin;
 using Microsoft.Owin.Cors;
 
-
 namespace WebApi1
 {
     public static class Startup

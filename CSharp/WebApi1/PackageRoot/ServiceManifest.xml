@@ -7,8 +7,7 @@
   <ServiceTypes>
     <!-- This is the name of your ServiceType. 
          This name must match the string used in RegisterServiceType call in Program.cs. -->
-    <StatelessServiceType ServiceTypeName="WebApi1Type" >
-    </StatelessServiceType>
+    <StatelessServiceType ServiceTypeName="WebApi1Type" />
   </ServiceTypes>
 
   <!-- Code package is your service executable. -->
@@ -22,6 +21,7 @@
     <EntryPoint>
       <ExeHost>
         <Program>WebApi1.exe</Program>
+        <WorkingFolder>CodePackage</WorkingFolder>
       </ExeHost>
     </EntryPoint>
   </CodePackage>

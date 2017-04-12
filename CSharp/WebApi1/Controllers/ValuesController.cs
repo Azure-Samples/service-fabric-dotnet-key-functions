@@ -8,16 +8,19 @@ using System.Web.Http;
 using Microsoft.ServiceFabric.Actors.Client;
 using Actor1.Interfaces;
 using Microsoft.ServiceFabric.Actors;
+using System.Threading;
 
 namespace WebApi1.Controllers
 {
+    [ServiceRequestActionFilter]
     public class ValuesController : ApiController
     {
+
         // GET api/values/getfromstatelessservice/1 
         public async Task<string> GetFromStatelessService(int id)
         {
             ServiceEventSource.Current.Message("Get invoked: {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-            var helloWorldClient = ServiceProxy.Create<ITestStatelessService>(new Uri("fabric:/Application1/Stateless1"));
+            var helloWorldClient = ServiceProxy.Create<ITestStatelessService>(new Uri("fabric:/SFApplication/Stateless1"));
             var message = await helloWorldClient.GetCount();
             return string.Format("[{0}] {1}: {2}", message.Time.ToString("yyyy-MM-dd HH:mm:ss"), message.Id, message.Count);
         }
@@ -30,7 +33,7 @@ namespace WebApi1.Controllers
         /// <returns>value string</returns> 
         public async Task<string> GetFromStatefulService(int id)
         {
-            var helloWorldClient = ServiceProxy.Create<ITestService>(new Uri("fabric:/Application1/Stateful1"), new Microsoft.ServiceFabric.Services.Client.ServicePartitionKey(id));
+            var helloWorldClient = ServiceProxy.Create<ITestService>(new Uri("fabric:/SFApplication/Stateful1"), new Microsoft.ServiceFabric.Services.Client.ServicePartitionKey(id));
             var message = await helloWorldClient.GetCount();
             return message;
         }
@@ -53,7 +56,7 @@ namespace WebApi1.Controllers
              * which means if you set value 10 to any one of partition key 0-2, 
              * then partition #1 will have value 10 but partition #2 still have value 0
             */
-            var helloWorldClient = ServiceProxy.Create<ITestService>(new Uri("fabric:/Application1/Stateful1"), new Microsoft.ServiceFabric.Services.Client.ServicePartitionKey(id));
+            var helloWorldClient = ServiceProxy.Create<ITestService>(new Uri("fabric:/SFApplication/Stateful1"), new Microsoft.ServiceFabric.Services.Client.ServicePartitionKey(id));
             await helloWorldClient.SetCount(value);
             return String.Format("id: {0} has been set to {1}", id, value);
         }
@@ -67,8 +70,8 @@ namespace WebApi1.Controllers
         [HttpGet]
         public async Task<string> GetFromActor(long id)
         {
-            var actor = ActorProxy.Create<IActor1>(new ActorId(id), new Uri("fabric:/Application1/Actor1ActorService "));
-            var value = await actor.GetCountAsync();
+            var actor = ActorProxy.Create<IActor1>(new ActorId(id), new Uri("fabric:/SFApplication/Actor1ActorService "));
+            var value = await actor.GetCountAsync(CancellationToken.None);
             return value.ToString();
         }
 
@@ -83,8 +86,8 @@ namespace WebApi1.Controllers
         public async Task<string> SetToActor(long id, int value)
         {
             var start = DateTime.Now;
-            var actor = ActorProxy.Create<IActor1>(new ActorId(id), new Uri("fabric:/Application1/Actor1ActorService "));
-            await actor.SetCountAsync(value);
+            var actor = ActorProxy.Create<IActor1>(new ActorId(id), new Uri("fabric:/SFApplication/Actor1ActorService "));
+            await actor.SetCountAsync(value, CancellationToken.None);
             return String.Format(
                 "{0}\n\nActor id: {1} has been set to {2}\n\n{3}",
                 start.ToString("yyyy-MM-dd HH:mm:ss"), id, value, DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));

@@ -9,7 +9,7 @@ using Microsoft.ServiceFabric.Actors.Runtime;
 
 namespace Actor1
 {
-    [EventSource(Name = "MyCompany-Application1-Actor1")]
+    [EventSource(Name = "MyCompany-SFApplication-Actor1")]
     internal sealed class ActorEventSource : EventSource
     {
         public static readonly ActorEventSource Current = new ActorEventSource();
@@ -18,7 +18,7 @@ namespace Actor1
         {
             // A workaround for the problem where ETW activities do not get tracked until Tasks infrastructure is initialized.
             // This problem will be fixed in .NET Framework 4.6.2.
-            Task.Run(() => { }).Wait();
+            Task.Run(() => { });
         }
 
         // Instance constructor is private to enforce singleton semantics

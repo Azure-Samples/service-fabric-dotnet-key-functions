@@ -9,7 +9,7 @@ using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace WebApi1
 {
-    [EventSource(Name = "MyCompany-Application1-WebApi1")]
+    [EventSource(Name = "MyCompany-SFApplication-WebApi1")]
     internal sealed class ServiceEventSource : EventSource
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();
@@ -18,7 +18,7 @@ namespace WebApi1
         {
             // A workaround for the problem where ETW activities do not get tracked until Tasks infrastructure is initialized.
             // This problem will be fixed in .NET Framework 4.6.2.
-            Task.Run(() => { }).Wait();
+            Task.Run(() => { });
         }
 
         // Instance constructor is private to enforce singleton semantics
@@ -149,16 +149,9 @@ namespace WebApi1
 
         private const int ServiceRequestStopEventId = 6;
         [Event(ServiceRequestStopEventId, Level = EventLevel.Informational, Message = "Service request '{0}' finished", Keywords = Keywords.Requests)]
-        public void ServiceRequestStop(string requestTypeName)
+        public void ServiceRequestStop(string requestTypeName, string exception = "")
         {
-            WriteEvent(ServiceRequestStopEventId, requestTypeName);
-        }
-
-        private const int ServiceRequestFailedEventId = 7;
-        [Event(ServiceRequestFailedEventId, Level = EventLevel.Error, Message = "Service request '{0}' failed", Keywords = Keywords.Requests)]
-        public void ServiceRequestFailed(string requestTypeName, string exception)
-        {
-            WriteEvent(ServiceRequestFailedEventId, exception);
+            WriteEvent(ServiceRequestStopEventId, requestTypeName, exception);
         }
         #endregion
 

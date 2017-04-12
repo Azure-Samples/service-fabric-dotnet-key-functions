@@ -19,7 +19,7 @@ You can use this project as your first Azure Service Fabric example and sample.
 
 *__Install Azure Service Fabric SDK__*
 
-This example uses Service Fabric SDK 2.1.163.9590.
+This example uses Service Fabric SDK 2.5.216.0.
 
 The following document will enable you to initialize your Service Fabric development environment.
 
@@ -43,7 +43,7 @@ You can get more detailed explanation for Service Fabric terminology on this web
 https://azure.microsoft.com/en-us/documentation/articles/service-fabric-technical-overview/
 
 
-*__Application1__*
+*__SFApplication__*
 
 It is the Service Fabric Application project. We need to use this project to publish and set all the micro-services deployment configurations, such as instance count and partition count.
 <br/>
@@ -181,7 +181,7 @@ CORS means to return additional HTTP header in response. Actually, it is not a S
 
 *__Enable HTTPS Web API Service__*
 
-Please check WebApi1 and Application1 projects to find the solution source code.
+Please check WebApi1 and SFApplication projects to find the solution source code.
 
 1\. Prepare a .pfx file. You can use makecert.exe to generate a test certificate. In this project, the name is vantest.pfx .
 
@@ -194,7 +194,7 @@ Please check WebApi1 and Application1 projects to find the solution source code.
 ```xml
 <Endpoint Protocol="https" Name="ServiceHttpsEndpoint" Type="Input" Port="8973" />
 ```
-5.\ Open Application1/ApplicationManifest.xml and add below configuration. Please notice X509FindValue is the thumbprint of vantest.pfx
+5.\ Open SFApplication/ApplicationManifest.xml and add below configuration. Please notice X509FindValue is the thumbprint of vantest.pfx
 
 ```xml
     <Policies>
@@ -237,7 +237,7 @@ Please check Stateless1 and WebApi1 projects to find the solution source code.
 public async Task<string> GetFromStatelessService(int id)
 {
     ServiceEventSource.Current.Message("Get invoked: {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-    var helloWorldClient = ServiceProxy.Create<ITestStatelessService>(new Uri("fabric:/Application1/Stateless1"));
+    var helloWorldClient = ServiceProxy.Create<ITestStatelessService>(new Uri("fabric:/SFApplication/Stateless1"));
     var message = await helloWorldClient.GetCount();
     return string.Format("[{0}] {1}: {2}", message.Time.ToString("yyyy-MM-dd HH:mm:ss"), message.Id, message.Count);
 }
@@ -267,7 +267,7 @@ Please notice that Stateful1 service uses ReliableDictionary to store value. Thi
 // GET api/values/getfromstatefulservice/[0-5]
 public async Task<string> GetFromStatefulService(int id)
 {
-    var helloWorldClient = ServiceProxy.Create<ITestService>(new Uri("fabric:/Application1/Stateful1"), new Microsoft.ServiceFabric.Services.Client.ServicePartitionKey(id));
+    var helloWorldClient = ServiceProxy.Create<ITestService>(new Uri("fabric:/SFApplication/Stateful1"), new Microsoft.ServiceFabric.Services.Client.ServicePartitionKey(id));
     var message = await helloWorldClient.GetCount();
     return message;
 }
@@ -284,7 +284,7 @@ public async Task<string> SetToStatefulService(int id, long value)
      * which means if you set value 10 to any one of partition key 0-2,
      * then partition #1 will have value 10 but partition #2 still have value 0
     */
-    var helloWorldClient = ServiceProxy.Create<ITestService>(new Uri("fabric:/Application1/Stateful1"), new Microsoft.ServiceFabric.Services.Client.ServicePartitionKey(id));
+    var helloWorldClient = ServiceProxy.Create<ITestService>(new Uri("fabric:/SFApplication/Stateful1"), new Microsoft.ServiceFabric.Services.Client.ServicePartitionKey(id));
     await helloWorldClient.SetCount(value);
     return String.Format("id: {0} has been set to {1}", id, value);
 }
@@ -293,7 +293,7 @@ public async Task<string> SetToStatefulService(int id, long value)
 
 Please notice that these API have a parameter called "partition id" and it only accepts 0-5.
 
-This is because in Application1/ApplicationPackageRoot/ApplicationManifest.xml, there is XML configuration which limited Stateful1 partition key from 0-5. You can also use this configuration item to control Stateful Service partition key range.
+This is because in SFApplication/ApplicationPackageRoot/ApplicationManifest.xml, there is XML configuration which limited Stateful1 partition key from 0-5. You can also use this configuration item to control Stateful Service partition key range.
 
 ```xml
 
@@ -330,7 +330,7 @@ Besides, we need to notice that actor is a single module. In other word, if ther
 public async Task<string> SetToActor(long actorid, int value)
 {
     var start = DateTime.Now;
-    var actor = ActorProxy.Create<IActor1>(new ActorId(actorid), new Uri("fabric:/Application1/Actor1ActorService "));
+    var actor = ActorProxy.Create<IActor1>(new ActorId(actorid), new Uri("fabric:/SFApplication/Actor1ActorService "));
     await actor.SetCountAsync(value);
     return String.Format(
         "{0}\n\nActor id: {1} has been set to {2}\n\n{3}",
@@ -341,7 +341,7 @@ public async Task<string> SetToActor(long actorid, int value)
 [HttpGet]
 public async Task<string> GetFromActor(long actorid)
 {
-    var actor = ActorProxy.Create<IActor1>(new ActorId(actorid), new Uri("fabric:/Application1/Actor1ActorService "));
+    var actor = ActorProxy.Create<IActor1>(new ActorId(actorid), new Uri("fabric:/SFApplication/Actor1ActorService "));
     var value = await actor.GetCountAsync();
     return value.ToString();
 }

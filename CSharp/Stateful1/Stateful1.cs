@@ -28,7 +28,7 @@ namespace Stateful1
         /// Optional override to create listeners (e.g., HTTP, Service Remoting, WCF, etc.) for this service replica to handle client or user requests.
         /// </summary>
         /// <remarks>
-        /// For more information on service communication, see http://aka.ms/servicefabricservicecommunication
+        /// For more information on service communication, see https://aka.ms/servicefabricservicecommunication
         /// </remarks>
         /// <returns>A collection of listeners.</returns>
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
@@ -52,9 +52,9 @@ namespace Stateful1
             while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                ServiceEventSource.Current.ServiceMessage(this, "Running {0}",
+                ServiceEventSource.Current.ServiceMessage(this.Context, "Stateful1-Running {0}",
                     DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-                await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(15), cancellationToken);
             }
         }
 

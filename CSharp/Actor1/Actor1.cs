@@ -22,6 +22,16 @@ namespace Actor1
     internal class Actor1 : Actor, IActor1
     {
         /// <summary>
+        /// Initializes a new instance of Actor1
+        /// </summary>
+        /// <param name="actorService">The Microsoft.ServiceFabric.Actors.Runtime.ActorService that will host this actor instance.</param>
+        /// <param name="actorId">The Microsoft.ServiceFabric.Actors.ActorId for this actor instance.</param>
+        public Actor1(ActorService actorService, ActorId actorId)
+            : base(actorService, actorId)
+        {
+        }
+
+        /// <summary>
         /// This method is called whenever an actor is activated.
         /// An actor is activated the first time any of its methods are invoked.
         /// </summary>
@@ -32,7 +42,7 @@ namespace Actor1
             // The StateManager is this actor's private state store.
             // Data stored in the StateManager will be replicated for high-availability for actors that use volatile or persisted state storage.
             // Any serializable object can be saved in the StateManager.
-            // For more information, see http://aka.ms/servicefabricactorsstateserialization
+            // For more information, see https://aka.ms/servicefabricactorsstateserialization
 
             return this.StateManager.TryAddStateAsync("count", 0);
         }
@@ -41,9 +51,9 @@ namespace Actor1
         /// TODO: Replace with your own actor method.
         /// </summary>
         /// <returns></returns>
-        Task<int> IActor1.GetCountAsync()
+        Task<int> IActor1.GetCountAsync(CancellationToken cancellationToken)
         {
-            return this.StateManager.GetStateAsync<int>("count");
+            return this.StateManager.GetStateAsync<int>("count", cancellationToken);
         }
 
         /// <summary>
@@ -51,12 +61,11 @@ namespace Actor1
         /// </summary>
         /// <param name="count"></param>
         /// <returns></returns>
-        Task IActor1.SetCountAsync(int count)
+        Task IActor1.SetCountAsync(int count, CancellationToken cancellationToken)
         {
-            Task.Delay(10000).Wait();
             // Requests are not guaranteed to be processed in order nor at most once.
             // The update function here verifies that the incoming count is greater than the current count to preserve order.
-            return this.StateManager.AddOrUpdateStateAsync("count", count, (key, value) => count > value ? count : value);
+            return this.StateManager.AddOrUpdateStateAsync("count", count, (key, value) => count > value ? count : value, cancellationToken);
         }
     }
 }

@@ -23,19 +23,6 @@ namespace Stateless1
             : base(context)
         { }
 
-        public Task<TestCount> GetCount()
-        {
-            return Task.Run<TestCount>(() =>
-            {
-                return new TestCount
-                {
-                    Count = new Random().Next(1000),
-                    Id = serviceId.ToString(),
-                    Time = DateTime.Now
-                };
-            });
-        }
-
         /// <summary>
         /// Optional override to create listeners (e.g., TCP, HTTP) for this service replica to handle client or user requests.
         /// </summary>
@@ -61,15 +48,28 @@ namespace Stateless1
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                ServiceEventSource.Current.ServiceMessage(this, "Working-{0}", ++iterations);
+                ServiceEventSource.Current.ServiceMessage(this.Context, "Stateless1-Working-{0}", ++iterations);
 
-                await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
+                await Task.Delay(TimeSpan.FromSeconds(15), cancellationToken);
             }
+        }
+
+        public Task<TestCount> GetCount()
+        {
+            return Task.Run<TestCount>(() =>
+            {
+                return new TestCount
+                {
+                    Count = new Random().Next(1000),
+                    Id = serviceId.ToString(),
+                    Time = DateTime.Now
+                };
+            });
         }
 
         protected override void OnAbort()
         {
-            File.AppendAllText(@"%TEMP%/Stateless1.log", 
+            File.AppendAllText(@"%TEMP%/Stateless1.log",
                 string.Format("[{0}] {1} : Abort\r\n", DateTime.Now.ToString("yyyy-MM-dd ")));
             base.OnAbort();
         }

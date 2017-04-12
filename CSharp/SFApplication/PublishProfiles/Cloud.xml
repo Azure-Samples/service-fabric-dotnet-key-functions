@@ -15,10 +15,11 @@
                                     StoreLocation="CurrentUser"
                                     StoreName="My" />
 
+       Example showing parameters for a cluster that uses Azure Active Directory (AAD) security:
+       <ClusterConnectionParameters ConnectionEndpoint="mycluster.westus.cloudapp.azure.com:19000"
+                                    AzureActiveDirectory="true"
+                                    ServerCertThumbprint="0123456789012345678901234567890123456789" />
   -->
-  <ClusterConnectionParameters ConnectionEndpoint="vantestsf.eastasia.cloudapp.azure.com:19000" />
+  <ClusterConnectionParameters ConnectionEndpoint="" />
   <ApplicationParameterFile Path="..\ApplicationParameters\Cloud.xml" />
-  <UpgradeDeployment Mode="Monitored" Enabled="true">
-    <Parameters FailureAction="Rollback" TimeoutSec="900" Force="True" />
-  </UpgradeDeployment>
 </PublishProfile>
