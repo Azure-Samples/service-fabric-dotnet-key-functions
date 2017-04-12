@@ -1,9 +1,3 @@
----
-services: service-fabric
-platforms: dotnet
-author: msonecode
----
-
 # Azure Service Fabric Key Functions Simple Project
 
 ## Introduction
@@ -230,6 +224,18 @@ Please check Stateless1 and WebApi1 projects to find the solution source code.
 
 1\. Open Stateless1/Stateless1.cs. There are interface `ITestStatelessService`, class `TestCount` and method `public Task<TestCount> GetCount()`. They defined Stateless1 service open API.
 
+Also, we need to override CreateServiceInstanceListeners method like below.
+
+```C#
+
+protected override IEnumerable<ServiceInstanceListener> CreateServiceInstanceListeners()
+{
+    return new[] { new ServiceInstanceListener(context =>
+    this.CreateServiceRemotingListener(context)) };
+}
+
+```
+
 2\. Open WebApi1/Controllers/ValuesController.cs. The codes at below will indicate how to build communication with Stateless1 service.
 
 ```C#
@@ -257,6 +263,18 @@ In this example, Stateless1 service returned an object so that WebApi1 service c
 Please check Stateless1 and WebApi1 projects to find the solution source code.
 
 1\. Open Stateful1/Stateful1.cs. There are interface `ITestService`, method `public async Task<string> GetCount()` and `public async Task SetCount(long count)`. They defined Stateful1 service open API.
+
+Also, we need to override CreateServiceReplicaListeners method like below.
+
+```C#
+
+protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
+{
+    return new[] { new ServiceReplicaListener(context =>
+    this.CreateServiceRemotingListener(context)) };
+}
+
+```
 
 Please notice that Stateful1 service uses ReliableDictionary to store value. This dictionary data will be synced among all the Stateful1 services in the same partition.
 
